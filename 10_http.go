@@ -1,4 +1,4 @@
-package main
+/*package main
 
 import (
 	"fmt"
@@ -16,4 +16,4 @@ func main() {
 	fmt.Println("starting server at :8080")
 	//http.ListenAndServe("31.170.160.61:8080", nil)
 	http.ListenAndServe(":8080", nil)
-}
+}*/
