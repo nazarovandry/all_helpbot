@@ -1,4 +1,4 @@
-/*package main
+package main
 
 import (
 	//"log"
@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	//"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
 
 )
@@ -58,7 +57,7 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
-func main() {
+/*func main() {
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -75,7 +74,7 @@ func main() {
 	})
 
 	router.Run(":" + port)
-}*/
+}
 
 package main
 
@@ -160,4 +159,4 @@ func private1(c *gin.Context) {
 
 func private2(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"hello": "Logged in user"})
-}
+}*/
