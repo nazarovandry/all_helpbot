@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log"
+	//"log"
 	"net/http"
-	"os"
+	//"os"
 	"fmt"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	//"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
 
 )
