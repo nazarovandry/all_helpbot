@@ -1,2 +1,1 @@
-andry 12 http://stats.sshoyer.net/flags/ru.png?hide&http://stats.sshoyer.net/flags/fi.png?show
-spef s http://stats.sshoyer.net/flags/fi.png?hide
+andry andry

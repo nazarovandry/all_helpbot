@@ -127,6 +127,28 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		</div>
 		</form>
 		</body>
+		<body>
+		<form action="/reload" method="post" class="reg-form">
+		<div class="form-row">
+			<label for="form_list">list.txt </label>
+			<textarea rows="3" cols="30" name="list"></textarea>
+		</div>
+		<div class="form-row">
+			<label for="form_cards">cards.txt </label>
+			<textarea rows="3" cols="30" name="cards"></textarea>
+  		</div>
+		<div class="form-row">
+			<input type="submit" name="load" value="Reload">
+		</div>
+		</form>
+		</body>
+		<body>
+		<form action="/download" method="post" class="reg-form">
+		<div class="form-row">
+			<input type="submit" name="load" value="Download">
+		</div>
+		</form>
+		</body>
 		</html>`))
 	}
 	w.Write([]byte(`
@@ -152,8 +174,9 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			links := strings.Split(elems[2], "&")
 			for _, link := range links {
 				pic := strings.Split(link, "?")
-				if pic[1] == "show" || (logged && elems[0] == session.Value) ||
-					(logged && session.Value == "andry"){
+				if len(pic) > 1 && (pic[1] == "show" ||
+					(logged && elems[0] == session.Value) ||
+					(logged && session.Value == "andry")){
 					w.Write([]byte(`
 					<img src=` + pic[0] + `>`))
 				} else {
@@ -351,7 +374,10 @@ func operCard(w http.ResponseWriter, r *http.Request) {
 							"?" + getShow(check)
 					}
 				}
-				lines[i] = elems[0] + " " + elems[1] + " " + newline[1:]
+				lines[i] = elems[0] + " " + elems[1]
+				if len(newline) > 0 {
+					lines[i] += " " + newline[1:]
+				}
 			}
 		}
 	}
@@ -389,6 +415,28 @@ func addCard(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	_ = ioutil.WriteFile("list.txt", []byte(strings.Join(lines, "\n")), 0644)
+	mu.Unlock()
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func download(w http.ResponseWriter, r *http.Request) {
+	mu := &sync.Mutex{}
+	mu.Lock()
+	list, _ := ioutil.ReadFile("list.txt")
+	cards, _ := ioutil.ReadFile("cards.txt")
+	mu.Unlock()
+	w.Write([]byte(list))
+	w.Write([]byte(cards))
+	return
+}
+
+func reload(w http.ResponseWriter, r *http.Request) {
+	list := r.FormValue("list")
+	cards := r.FormValue("cards")
+	mu := &sync.Mutex{}
+	mu.Lock()
+	_ = ioutil.WriteFile("list.txt", []byte(list), 0644)
+	_ = ioutil.WriteFile("cards.txt", []byte(cards), 0644)
 	mu.Unlock()
 	http.Redirect(w, r, "/", http.StatusFound)
 }
@@ -506,6 +554,8 @@ func main() {
 	http.HandleFunc("/opercard", operCard)
 	http.HandleFunc("/users", users)
 	http.HandleFunc("/setpictures", setPictures)
+	http.HandleFunc("/reload", reload)
+	http.HandleFunc("/download", download)
 	http.HandleFunc("/", mainPage)
 
 	log.Println("starting server at :8080")
