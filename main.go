@@ -210,24 +210,6 @@ func hiddenPic() (string) {
 	return ""
 }
 
-func allRight(name string, pass string) (bool) {
-	if wrong(name) || wrong(pass) {
-		return false
-	}
-	mu := &sync.Mutex{}
-	mu.Lock()
-	data, _ := ioutil.ReadFile("list.txt")
-	mu.Unlock()
-	lines := strings.Split(string(data), "\n")
-	for _, l := range lines {
-		elem := strings.Split(l, " ")
-		if len(elem) >= 2 && elem[0] == name {
-			return elem[1] == pass
-		}
-	}
-	return false
-}
-
 func setPictures(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	url := r.FormValue("url")
@@ -439,6 +421,24 @@ func reload(w http.ResponseWriter, r *http.Request) {
 	_ = ioutil.WriteFile("cards.txt", []byte(cards), 0644)
 	mu.Unlock()
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func allRight(name string, pass string) (bool) {
+	if wrong(name) || wrong(pass) {
+		return false
+	}
+	mu := &sync.Mutex{}
+	mu.Lock()
+	data, _ := ioutil.ReadFile("list.txt")
+	mu.Unlock()
+	lines := strings.Split(string(data), "\n")
+	for _, l := range lines {
+		elem := strings.Split(l, " ")
+		if len(elem) >= 2 && elem[0] == name {
+			return elem[1] == pass
+		}
+	}
+	return false
 }
 
 func loginPage(w http.ResponseWriter, r *http.Request) {
