@@ -1,4 +1,7 @@
-ru http://stats.sshoyer.net/flags/ru.png
-se http://stats.sshoyer.net/flags/se.png
-fi http://stats.sshoyer.net/flags/fi.png
-hide http://stats.sshoyer.net/flags/pl.png
+1w https://i.imgur.com/zPB0YuD.png
+as https://i.imgur.com/S2sWhDP.png
+bt https://i.imgur.com/DFwsl4x.png
+ch01 https://i.imgur.com/0HTf4fp.png
+gz1 https://i.imgur.com/phw2LMY.png
+hide https://i.imgur.com/ARUaqQG.png
+sc https://i.imgur.com/OkqAj8C.png
