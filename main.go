@@ -508,5 +508,5 @@ func main() {
 	http.HandleFunc("/", mainPage)
 
 	log.Println("starting server at :8080")
-	http.ListenAndServe(":port", nil)
+	http.ListenAndServe(":"+port, nil)
 }
