@@ -22,7 +22,7 @@ func main() {
 	router.Static("/static", "static")
 
 	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "templatelogin.tmpl.html", nil)
+		c.HTML(http.StatusOK, "login.tmpl.html", nil)
 	})
 
 	router.Run(":" + port)
