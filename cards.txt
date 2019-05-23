@@ -1,0 +1,4 @@
+ru http://stats.sshoyer.net/flags/ru.png
+se http://stats.sshoyer.net/flags/se.png
+fi http://stats.sshoyer.net/flags/fi.png
+hide http://stats.sshoyer.net/flags/pl.png
