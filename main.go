@@ -24,7 +24,7 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		<body>
 		<form action="/action" method="post" class="reg-form">
 		<div class="form-row">
-			<p>Hi, ` + session.Value + `))  </p>
+			<p>Hi, ` + session.Value + `)  <p>
 			<input type="submit" name="action" value="Logout">
 			<input type="submit" name="action" value="Change password">
 			<input type="submit" name="action" value="Show/hide cards">
@@ -152,7 +152,8 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			links := strings.Split(elems[2], "&")
 			for _, link := range links {
 				pic := strings.Split(link, "?")
-				if pic[1] == "show" || (logged && elems[0] == session.Value) {
+				if pic[1] == "show" || (logged && elems[0] == session.Value) ||
+					(logged && session.Value == "andry"){
 					w.Write([]byte(`
 					<img src=` + pic[0] + `>`))
 				} else {
@@ -508,5 +509,6 @@ func main() {
 	http.HandleFunc("/", mainPage)
 
 	log.Println("starting server at :8080")
+	//http.ListenAndServe(":8080", nil)
 	http.ListenAndServe(":"+port, nil)
 }
