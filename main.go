@@ -3,13 +3,13 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	"time"
 	"io/ioutil"
 	"sync"
 	"strings"
 	"strconv"
 
+	"os"
 	_ "github.com/heroku/x/hmetrics/onload"
 )
 
@@ -417,6 +417,8 @@ func reload(w http.ResponseWriter, r *http.Request) {
 	cards := r.FormValue("cards")
 	mu := &sync.Mutex{}
 	mu.Lock()
+	list = strings.Replace(list, "\r", "", -1)
+	cards = strings.Replace(cards, "\r", "", -1)
 	_ = ioutil.WriteFile("list.txt", []byte(list), 0644)
 	_ = ioutil.WriteFile("cards.txt", []byte(cards), 0644)
 	mu.Unlock()
@@ -543,6 +545,13 @@ func actionPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	list, _ := ioutil.ReadFile("list.txt")
+	cards, _ := ioutil.ReadFile("cards.txt")
+	_ = ioutil.WriteFile("list.txt",
+		[]byte(strings.Replace(string(list), "\r", "", -1)), 0644)
+	_ = ioutil.WriteFile("cards.txt",
+		[]byte(strings.Replace(string(cards), "\r", "", -1)), 0644)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
