@@ -176,13 +176,9 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		</form>
 		<form action="/reload" method="post" class="reg-form">
 		<div class="form-row">
-			<label for="form_list">list.txt </label>
-			<textarea rows="3" cols="30" name="list"></textarea>
+			<label for="form_saved">saved.txt </label>
+			<textarea rows="3" cols="30" name="saved"></textarea>
 		</div>
-		<div class="form-row">
-			<label for="form_cards">cards.txt </label>
-			<textarea rows="3" cols="30" name="cards"></textarea>
-  		</div>
 		<div class="form-row">
 			<input type="submit" name="load" value="Reload">
 		</div>
@@ -474,6 +470,7 @@ func reload(w http.ResponseWriter, r *http.Request) {
 	logged := err != http.ErrNoCookie
 	if !logged || session.Value != "andry" {
 		http.Redirect(w, r, "/", http.StatusFound)
+		return
 	}
 	saved := r.FormValue("saved")
 	mu := &sync.Mutex{}
