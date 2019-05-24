@@ -9,19 +9,70 @@ import (
 	"strings"
 	"strconv"
 
-	"os"
-	_ "github.com/heroku/x/hmetrics/onload"
+	//"os"
+	//_ "github.com/heroku/x/hmetrics/onload"
 )
 
-func mainPage(w http.ResponseWriter, r *http.Request) {
+func site() (string) {
+	//return "https://elmacards.herokuapp.com/"
+	return "/"
+}
+
+func writeEnd(w http.ResponseWriter) {
+	w.Write([]byte(`
+			</div>
+		</body>
+		</html>
+	`))
+}
+
+func writeGeneral(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	logged := err != http.ErrNoCookie
-
+	w.Write([]byte(`<!doctype html>
+	<html>
+		<head>
+			<title>Elma Cards</title>
+			<style type="text/css">
+			body {
+				background:	#808080;
+			}
+			#head {
+				background:	#DCDCDC;
+				border:		1px groove black;
+				padding:	10px;
+			}
+			#menu {
+				float:		left;
+				background:	#DCDCDC;
+				border:		1px groove black;
+				width:		150px;
+				padding:	10px;
+				margin:		10px 10px 10px 0px;
+			}
+			#menu a {
+				display:			block;
+				color:				black;
+				text-decoration:	none;
+			}
+			#text {
+				background:	#DCDCDC;
+				border:		1px groove black;
+				width:		calc($(window).weight - 30px - $(#menu).weight);
+				overflow:	scroll;
+				padding:	10px;
+				margin:		10px 0px 10px 10px;
+			}
+			table {
+				overflow-x:	auto;
+			}
+			</style>
+		</head>
+		<body>
+			<div id="head">
+				<h1>Elma Cards</h1>`))
 	if logged {
 		w.Write([]byte(`
-		<!doctype html>
-		<html>
-		<body>
 		<form action="/action" method="post" class="reg-form">
 		<div class="form-row">
 			<p>Hi, ` + session.Value + `)  <p>
@@ -29,37 +80,40 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			<input type="submit" name="action" value="Change password">
 			<input type="submit" name="action" value="Show/hide cards">
 		</div>
-		</form>
-		</body>
-		</html>`))
+		</form>`))
 	} else {
 		w.Write([]byte(`
-		<!doctype html>
-		<html>
-		<body>
 		<form action="/login" method="post" class="reg-form">
 		<div class="form-row">
 			<label for="form_name">Name: </label>
     		<input type="text" id="form_name" name="name">
   		</div>
-
 		<div class="form-row">
 			<label for="form_pw">Password: </label>
 			<input type="password" id="form_pw" name="password">
 		</div>
-
 		<div class="form-row">
 			<input type="submit" value="Oke">
 		</div>
-		</form>
-		</body>
-		</html>`))
+		</form>`))
 	}
+		w.Write([]byte(`
+			</div>
+			<div id="menu">
+				<div><a href="` + site() + `">Standings</a></div>
+				<div><a href="` + site() + `comments">Comments</a></div>
+				<p></p>
+				<p>&copy;AndrY 2019</p>
+			</div>
+			<div id="text">`))
+}
+
+func mainPage(w http.ResponseWriter, r *http.Request) {
+	session, err := r.Cookie("session_id")
+	logged := err != http.ErrNoCookie
+	writeGeneral(w, r)
 	if logged && session.Value == "andry" {
 		w.Write([]byte(`
-		<!doctype html>
-		<html>
-		<body>
 		<form action="/users" method="post" class="reg-form">
 		<div class="form-row">
 			<label for="form_name">Name: </label>
@@ -76,8 +130,6 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			<input type="submit" name="but" value="Delete man">
 		</div>
 		</form>
-		</body>
-		<body>
 		<form action="/addcard" method="post" class="reg-form">
 		<div class="form-row">
 			<label for="form_cars">Card: </label>
@@ -93,8 +145,6 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			<input type="submit" value="Add card">
 		</div>
 		</form>
-		</body>
-		<body>
 		<form action="/opercard" method="post" class="reg-form">
 		<div class="form-row">
 			<label for="form_card">Card number: </label>
@@ -110,8 +160,6 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			<input type="submit" name="card_oper" value="Make card hidden">
 		</div>
 		</form>
-		</body>
-		<body>
 		<form action="/setpictures" method="post" class="reg-form">
 		<div class="form-row">
 			<label for="form_name">Picture name: </label>
@@ -126,8 +174,6 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			<input type="submit" name="pic_oper" value="Create/edit pic">
 		</div>
 		</form>
-		</body>
-		<body>
 		<form action="/reload" method="post" class="reg-form">
 		<div class="form-row">
 			<label for="form_list">list.txt </label>
@@ -141,20 +187,14 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			<input type="submit" name="load" value="Reload">
 		</div>
 		</form>
-		</body>
-		<body>
 		<form action="/download" method="post" class="reg-form">
 		<div class="form-row">
 			<input type="submit" name="load" value="Download">
 		</div>
-		</form>
-		</body>
-		</html>`))
+		</form>`))
 	}
 	w.Write([]byte(`
-		<!doctype html>
-		<html>
-		<table border="1">
+		<table border="1" bgcolor="white">
 			<tr>
 				<th>Name</th>
 				<th>Cards</th>
@@ -187,12 +227,8 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write([]byte(`</td></tr>`))
 	}
-	w.Write([]byte(`
-		</table>
-		</p><p>
-		</p>&copy;AndrY 2019<p>
-		</html>
-	`))
+	w.Write([]byte(`</table>`))
+	writeEnd(w)
 }
 
 func hiddenPic() (string) {
@@ -421,10 +457,13 @@ func download(w http.ResponseWriter, r *http.Request) {
 		mu.Lock()
 		list, _ := ioutil.ReadFile("list.txt")
 		cards, _ := ioutil.ReadFile("cards.txt")
+		comm, _ := ioutil.ReadFile("comm.txt")
 		mu.Unlock()
 		w.Write([]byte(list))
-		w.Write([]byte("===="))
+		w.Write([]byte("!"))
 		w.Write([]byte(cards))
+		w.Write([]byte("!"))
+		w.Write([]byte(comm))
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
@@ -436,14 +475,18 @@ func reload(w http.ResponseWriter, r *http.Request) {
 	if !logged || session.Value != "andry" {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
-	list := r.FormValue("list")
-	cards := r.FormValue("cards")
+	saved := r.FormValue("saved")
 	mu := &sync.Mutex{}
 	mu.Lock()
-	list = strings.Replace(list, "\r", "", -1)
-	cards = strings.Replace(cards, "\r", "", -1)
-	_ = ioutil.WriteFile("list.txt", []byte(list), 0644)
-	_ = ioutil.WriteFile("cards.txt", []byte(cards), 0644)
+	saved = strings.Replace(saved, "\r", "", -1)
+	blocks := strings.Split(saved, "!")
+	if len(blocks) < 3 {
+		return
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+	_ = ioutil.WriteFile("list.txt", []byte(blocks[0]), 0644)
+	_ = ioutil.WriteFile("cards.txt", []byte(blocks[1]), 0644)
+	_ = ioutil.WriteFile("comm.txt", []byte(blocks[2]), 0644)
 	mu.Unlock()
 	http.Redirect(w, r, "/", http.StatusFound)
 }
@@ -496,11 +539,10 @@ func actionPage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	} else if button == "Show/hide cards" {
+		writeGeneral(w, r)
 		w.Write([]byte(`
-		<!doctype html>
-		<html>
 		<form action="/opercard" method="post" class="reg-form">
-		<table border="1">
+		<table border="1" bgcolor="white">
 			<tr>
 				<th>Card</th>
 				<th>Shown</th>
@@ -542,15 +584,13 @@ func actionPage(w http.ResponseWriter, r *http.Request) {
 			<input type="submit" name="card_oper" value="Oke">
 			<input type="submit" name="card_oper" value="No, I dont want">
 		</div>
-		</form>
-		</html>`))
+		</form>`))
+		writeEnd(w)
 		return
 	}
 	// else "Change Password"
+	writeGeneral(w, r)
 	w.Write([]byte(`
-		<!doctype html>
-		<html>
-		<body>
 		<form action="/users" method="post" class="reg-form">
 		<div class="form-row">
 			<label for="form_passnew">New password: </label>
@@ -565,23 +605,86 @@ func actionPage(w http.ResponseWriter, r *http.Request) {
 			<input type="submit" name="but" value="No, I dont want">
 		</div>
 		</form>
-		</body>
-		</html>
 	`))
+	writeEnd(w)
+}
+
+func send(w http.ResponseWriter, r *http.Request) {
+	session, err := r.Cookie("session_id")
+	logged := err != http.ErrNoCookie
+	name := r.FormValue("name")
+	mess := r.FormValue("mess")
+	send := r.FormValue("send")
+	if send != "Send" {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+	if !logged {
+		name += "(?)"
+	} else {
+		name = session.Value
+	}
+	mu := &sync.Mutex{}
+	mu.Lock()
+	data, _ := ioutil.ReadFile("comm.txt")
+	newdata := name + " " + mess + "\n" + string(data)
+	_ = ioutil.WriteFile("comm.txt", []byte(newdata), 0644)
+	mu.Unlock()
+	http.Redirect(w, r, "/comments", http.StatusFound)
+}
+
+func commPage(w http.ResponseWriter, r *http.Request) {
+	_, err := r.Cookie("session_id")
+	logged := err != http.ErrNoCookie
+	writeGeneral(w, r)
+	w.Write([]byte(`<form action="/send" method="post" class="reg-form">`))
+	if !logged {
+		w.Write([]byte(`
+		<div class="form-row">
+			<label for="form_url">Who are you? </label>
+    		<input type="text" id="form_name" name="name">
+  		</div>`))
+	}
+	w.Write([]byte(`
+		<div class="form-row">
+			<label for="form_list">Comment: </label>
+			<textarea rows="3" cols="30" name="mess"></textarea>
+		</div>
+		<div class="form-row">
+			<input type="submit" name="send" value="Send">
+		</div>
+		</form>
+		<p></p>`))
+	mu := &sync.Mutex{}
+	mu.Lock()
+	data, _ := ioutil.ReadFile("comm.txt")
+	mu.Unlock()
+	array := strings.Split(string(data), "\n")
+	for _, ar := range array {
+		first := strings.Split(string(ar), " ")
+		if len(first) > 1 {
+			w.Write([]byte(`<p><b>` + first[0] + ` </b>`))
+			w.Write([]byte(first[1] + `</p>`))
+		}
+	}
+	writeEnd(w)
 }
 
 func main() {
 	list, _ := ioutil.ReadFile("list.txt")
 	cards, _ := ioutil.ReadFile("cards.txt")
+	comm, _ := ioutil.ReadFile("comm.txt")
 	_ = ioutil.WriteFile("list.txt",
 		[]byte(strings.Replace(string(list), "\r", "", -1)), 0644)
 	_ = ioutil.WriteFile("cards.txt",
 		[]byte(strings.Replace(string(cards), "\r", "", -1)), 0644)
+	_ = ioutil.WriteFile("comm.txt",
+		[]byte(strings.Replace(string(comm), "\r", "", -1)), 0644)
 
-	port := os.Getenv("PORT")
+	/*port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
-	}
+	}*/
 
 	http.HandleFunc("/login", loginPage)
 	http.HandleFunc("/action", actionPage)
@@ -591,9 +694,11 @@ func main() {
 	http.HandleFunc("/setpictures", setPictures)
 	http.HandleFunc("/reload", reload)
 	http.HandleFunc("/download", download)
+	http.HandleFunc("/comments", commPage)
+	http.HandleFunc("/send", send)
 	http.HandleFunc("/", mainPage)
 
 	log.Println("starting server at :8080")
-	//http.ListenAndServe(":8080", nil)
-	http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":8080", nil)
+	//http.ListenAndServe(":"+port, nil)
 }
