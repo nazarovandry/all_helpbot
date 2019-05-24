@@ -11,7 +11,7 @@ import (
 
 func site() (string) {
 	return "https://cdracamle.herokuapp.com/"
-	//return "/"
+	// return "/"
 }
 
 func sendmess(w http.ResponseWriter, r *http.Request) {
