@@ -156,7 +156,7 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		<html>
 		<table border="1">
 			<tr>
-				<th colspan="2">Name</th>
+				<th>Name</th>
 				<th>Cards</th>
 			</tr>`))
 	mu := &sync.Mutex{}
