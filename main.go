@@ -112,6 +112,17 @@ func writeGeneral(w http.ResponseWriter, r *http.Request) {
 }
 
 func mainPage(w http.ResponseWriter, r *http.Request) {
+	req, err := http.NewRequest(http.MethodGet,
+		"https://elmacards.herokuapp.com/events", nil)
+	if err == nil {
+		client := &http.Client{Timeout:	time.Second}
+		_, err := client.Do(req)
+		if err != nil {
+			log.Println(err.Error())
+		}
+	} else {
+		log.Println(err.Error())
+	}
 	session, err := r.Cookie("session_id")
 	logged := err != http.ErrNoCookie
 	writeGeneral(w, r)
@@ -679,6 +690,14 @@ func commPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func eventsPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		mu := &sync.Mutex{}
+		mu.Lock()
+		data, _ := ioutil.ReadFile("comm.txt")
+		newdata := string(data) + "\nTEST!"
+		_ = ioutil.WriteFile("comm.txt", []byte(newdata), 0644)
+		mu.Unlock()
+	}
 	writeGeneral(w, r)
 	w.Write([]byte(`<p><b>Internals Inspired Cup (2019)</b> [ ` +
 		`<a href="http://mopolauta.moposite.com/viewtopic.php?f` +
