@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
-	"time"
+	//"time"
 
 	"os"
 	_ "github.com/heroku/x/hmetrics/onload"
@@ -15,8 +15,8 @@ func site() (string) {
 }
 
 func sendmess(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(`TEST`))
-	if r.Method == http.MethodGet {
+	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
+	/*if r.Method == http.MethodGet {
 		time.Sleep(9 * time.Minute)
 		req, err := http.NewRequest(http.MethodGet,
 			"https://elmacards.herokuapp.com/events", nil)
@@ -29,7 +29,7 @@ func sendmess(w http.ResponseWriter, r *http.Request) {
 		} else {
 			log.Println(err.Error())
 		}
-	}
+	}*/
 }
 
 func main() {
