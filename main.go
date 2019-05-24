@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
-	//"time"
+	"time"
 
 	"os"
 	_ "github.com/heroku/x/hmetrics/onload"
