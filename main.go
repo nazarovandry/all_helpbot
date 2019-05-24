@@ -439,8 +439,8 @@ func reload(w http.ResponseWriter, r *http.Request) {
 	cards := r.FormValue("cards")
 	mu := &sync.Mutex{}
 	mu.Lock()
-	list = strings.Replace(list, "\r", "", -1)
-	cards = strings.Replace(cards, "\r", "", -1)
+	list = strings.Replace(list, "\r", "\n", -1)
+	cards = strings.Replace(cards, "\r", "\n", -1)
 	_ = ioutil.WriteFile("list.txt", []byte(list), 0644)
 	_ = ioutil.WriteFile("cards.txt", []byte(cards), 0644)
 	mu.Unlock()
@@ -573,9 +573,9 @@ func main() {
 	list, _ := ioutil.ReadFile("list.txt")
 	cards, _ := ioutil.ReadFile("cards.txt")
 	_ = ioutil.WriteFile("list.txt",
-		[]byte(strings.Replace(string(list), "\r", "", -1)), 0644)
+		[]byte(strings.Replace(string(list), "\r", "\n", -1)), 0644)
 	_ = ioutil.WriteFile("cards.txt",
-		[]byte(strings.Replace(string(cards), "\r", "", -1)), 0644)
+		[]byte(strings.Replace(string(cards), "\r", "\n", -1)), 0644)
 
 	port := os.Getenv("PORT")
 	if port == "" {
