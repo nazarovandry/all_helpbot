@@ -40,7 +40,7 @@ func main() {
 		log.Fatal("$PORT must be set")
 	}
 	
-	req, err := http.NewRequest(http.MethodGet,
+	/*req, err := http.NewRequest(http.MethodGet,
 		"https://elmacards.herokuapp.com/events", nil)
 	if err == nil {
 		client := &http.Client{Timeout:	2 * time.Second}
@@ -50,7 +50,7 @@ func main() {
 		}
 	} else {
 		log.Println(err.Error())
-	}
+	}*/
 	
 	http.ListenAndServe(":"+port, nil)
 
