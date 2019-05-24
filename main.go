@@ -156,7 +156,7 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		<html>
 		<table border="1">
 			<tr>
-				<th>Name</th>
+				<th colspan="2">Name</th>
 				<th>Cards</th>
 			</tr>`))
 	mu := &sync.Mutex{}
@@ -211,6 +211,11 @@ func hiddenPic() (string) {
 }
 
 func setPictures(w http.ResponseWriter, r *http.Request) {
+	session, err := r.Cookie("session_id")
+	logged := err != http.ErrNoCookie
+	if !logged || session.Value != "andry" {
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
 	name := r.FormValue("name")
 	url := r.FormValue("url")
 	button := r.FormValue("pic_oper")
@@ -409,17 +414,27 @@ func addCard(w http.ResponseWriter, r *http.Request) {
 }
 
 func download(w http.ResponseWriter, r *http.Request) {
-	mu := &sync.Mutex{}
-	mu.Lock()
-	list, _ := ioutil.ReadFile("list.txt")
-	cards, _ := ioutil.ReadFile("cards.txt")
-	mu.Unlock()
-	w.Write([]byte(list))
-	w.Write([]byte(cards))
-	return
+	session, err := r.Cookie("session_id")
+	logged := err != http.ErrNoCookie
+	if logged && session.Value == "andry" {
+		mu := &sync.Mutex{}
+		mu.Lock()
+		list, _ := ioutil.ReadFile("list.txt")
+		cards, _ := ioutil.ReadFile("cards.txt")
+		mu.Unlock()
+		w.Write([]byte(list))
+		w.Write([]byte(cards))
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func reload(w http.ResponseWriter, r *http.Request) {
+	session, err := r.Cookie("session_id")
+	logged := err != http.ErrNoCookie
+	if !logged || session.Value != "andry" {
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
 	list := r.FormValue("list")
 	cards := r.FormValue("cards")
 	mu := &sync.Mutex{}
