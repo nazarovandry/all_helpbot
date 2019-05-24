@@ -9,13 +9,13 @@ import (
 	"strings"
 	"strconv"
 
-	//"os"
-	//_ "github.com/heroku/x/hmetrics/onload"
+	"os"
+	_ "github.com/heroku/x/hmetrics/onload"
 )
 
 func site() (string) {
-	//return "https://elmacards.herokuapp.com/"
-	return "/"
+	return "https://elmacards.herokuapp.com/"
+	//return "/"
 }
 
 func writeEnd(w http.ResponseWriter) {
@@ -681,10 +681,10 @@ func main() {
 	_ = ioutil.WriteFile("comm.txt",
 		[]byte(strings.Replace(string(comm), "\r", "", -1)), 0644)
 
-	/*port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
-	}*/
+	}
 
 	http.HandleFunc("/login", loginPage)
 	http.HandleFunc("/action", actionPage)
@@ -699,6 +699,6 @@ func main() {
 	http.HandleFunc("/", mainPage)
 
 	log.Println("starting server at :8080")
-	http.ListenAndServe(":8080", nil)
-	//http.ListenAndServe(":"+port, nil)
+	//http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+port, nil)
 }
