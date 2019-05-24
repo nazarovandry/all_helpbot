@@ -203,7 +203,7 @@ func hiddenPic() (string) {
 	array := strings.Split(string(cards), "\n")
 	for _, ar := range array {
 		first := strings.Split(string(ar), " ")
-		if len(first) > 0 && first[0] == "hide" {
+		if len(first) > 1 && first[0] == "hide" {
 			return first[1]
 		}
 	}
@@ -292,10 +292,15 @@ func users(w http.ResponseWriter, r *http.Request) {
 			(button == "Oke" && logged && session.Value == elems[0]) {
 			if button == "Delete man" && pass == "delete" {
 				lines[i] = ""
-			} else if button == "Change name" {
-				lines[i] = pass + " " + elems[1] + " " + elems[2]
+			} else if button == "Change name" && len(elems) > 1 {
+				lines[i] = pass + " " + elems[1]
+				if len(elems) > 2
+					lines[i] += " " + elems[2]
 			} else if button == "Change password" || button == "Oke" {
-				lines[i] = elems[0] + " " + pass + " " + elems[2]
+				if len(elems) > 1
+					lines[i] = elems[0] + " " + pass
+				if len(elems) > 2
+					lines[i] += " " + elems[2]
 			} else if button == "Add man" {
 				log.Println("Name is already exists.")
 				http.Redirect(w, r, "/", http.StatusFound)
@@ -493,20 +498,23 @@ func actionPage(w http.ResponseWriter, r *http.Request) {
 				links := strings.Split(elems[2], "&")
 				for i, link := range links {
 					pic := strings.Split(link, "?")
-					w.Write([]byte(`<tr>
-						<td><img src=` + pic[0] + `></td>
-						<td><div class="form-row">`))
-					is := strconv.Itoa(i)
-					if pic[1] == "hide" {
-						w.Write([]byte(`
-							<input type="checkbox" id="check` + is +
-								 `" name="shown` + is + `">`))
-					} else {
-						w.Write([]byte(`
-							<input type="checkbox" id="check` + is +
-								`" name="shown` + is + `" checked="checked">`))
+					if len(pic) > 1 {
+						w.Write([]byte(`<tr>
+							<td><img src=` + pic[0] + `></td>
+							<td><div class="form-row">`))
+						is := strconv.Itoa(i)
+						if pic[1] == "hide" {
+							w.Write([]byte(`
+								<input type="checkbox" id="check` + is +
+									 `" name="shown` + is + `">`))
+						} else {
+							w.Write([]byte(`
+								<input type="checkbox" id="check` + is +
+									`" name="shown` +
+									is + `" checked="checked">`))
+						}
+						w.Write([]byte(`</div></td></tr>`))
 					}
-					w.Write([]byte(`</div></td></tr>`))
 				}
 			}
 		}
