@@ -15,6 +15,7 @@ func site() (string) {
 }
 
 func sendmess(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(`TEST`))
 	if r.Method == http.MethodGet {
 		time.Sleep(9 * time.Minute)
 		req, err := http.NewRequest(http.MethodGet,
