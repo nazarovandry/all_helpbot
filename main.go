@@ -30,7 +30,7 @@ func sendmess(w http.ResponseWriter, r *http.Request) {
 		} else {
 			log.Println(err.Error())
 		}
-		//time.Sleep(9 * time.Minute)
+		time.Sleep(9 * time.Minute)
 	//}
 }
 
