@@ -294,13 +294,15 @@ func users(w http.ResponseWriter, r *http.Request) {
 				lines[i] = ""
 			} else if button == "Change name" && len(elems) > 1 {
 				lines[i] = pass + " " + elems[1]
-				if len(elems) > 2
+				if len(elems) > 2 {
 					lines[i] += " " + elems[2]
-			} else if button == "Change password" || button == "Oke" {
-				if len(elems) > 1
-					lines[i] = elems[0] + " " + pass
-				if len(elems) > 2
+				}
+			} else if (button == "Change password" || button == "Oke") &&
+				len(elems) > 1 {
+				lines[i] = elems[0] + " " + pass
+				if len(elems) > 2 {
 					lines[i] += " " + elems[2]
+				}
 			} else if button == "Add man" {
 				log.Println("Name is already exists.")
 				http.Redirect(w, r, "/", http.StatusFound)
