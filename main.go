@@ -42,6 +42,14 @@ func writeGeneral(w http.ResponseWriter, r *http.Request) {
 				border:		1px groove black;
 				padding:	10px;
 			}
+			#text {
+				background:	#DCDCDC;
+				border:		1px groove black;
+				width:		calc($(window).weight - 30px - $(#menu).width);
+				padding:	10px;
+				margin:		10px 0px 10px 10px;
+				overflow:	scroll;
+			}
 			#menu {
 				float:		left;
 				background:	#DCDCDC;
@@ -55,16 +63,9 @@ func writeGeneral(w http.ResponseWriter, r *http.Request) {
 				color:				black;
 				text-decoration:	none;
 			}
-			#text {
-				background:	#DCDCDC;
-				border:		1px groove black;
-				width:		calc($(window).weight - 30px - $(#menu).weight);
-				overflow:	scroll;
-				padding:	10px;
-				margin:		10px 0px 10px 10px;
-			}
-			table {
-				overflow-x:	auto;
+			#text a {
+				color:				blue;
+				text-decoration:	none;
 			}
 			</style>
 		</head>
@@ -75,10 +76,10 @@ func writeGeneral(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`
 		<form action="/action" method="post" class="reg-form">
 		<div class="form-row">
-			<p>Hi, ` + session.Value + `)  <p>
+			<p>Hi, ` + session.Value + `)
 			<input type="submit" name="action" value="Logout">
 			<input type="submit" name="action" value="Change password">
-			<input type="submit" name="action" value="Show/hide cards">
+			</p>
 		</div>
 		</form>`))
 	} else {
@@ -97,15 +98,17 @@ func writeGeneral(w http.ResponseWriter, r *http.Request) {
 		</div>
 		</form>`))
 	}
-		w.Write([]byte(`
-			</div>
-			<div id="menu">
-				<div><a href="` + site() + `">Standings</a></div>
-				<div><a href="` + site() + `comments">Comments</a></div>
-				<p></p>
-				<p>&copy;AndrY 2019</p>
-			</div>
-			<div id="text">`))
+	w.Write([]byte(`
+		</div>
+		<div id="menu">
+			<div><a href="` + site() + `">Standings</a></div>
+			<div><a href="` + site() + `events">Events</a></div>
+			<div><a href="` + site() + `comments">Comments</a></div>
+			<p></p>
+			<p><span style="color:#808080">&copy;AndrY 2019</span></p>
+		</div>
+		<div id="text">
+	`))
 }
 
 func mainPage(w http.ResponseWriter, r *http.Request) {
@@ -190,6 +193,14 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		</form>`))
 	}
 	w.Write([]byte(`
+		</p>  Cards are given for participating in some cups, level packs` +
+		` and etc. Probably these crads will be printed in plactic and sent` +
+		` (ofc with better design).<p>
+		<form action="/action" method="post" class="reg-form">
+		<div class="form-row">
+			<input type="submit" name="action" value="Show/hide cards">
+		</div>
+		</form>
 		<table border="1" bgcolor="white">
 			<tr>
 				<th>Name</th>
@@ -624,7 +635,8 @@ func send(w http.ResponseWriter, r *http.Request) {
 	mu := &sync.Mutex{}
 	mu.Lock()
 	data, _ := ioutil.ReadFile("comm.txt")
-	newdata := name + " " + mess + "\n" + string(data)
+	newdata :=  strings.Split(time.Now().String(), ".")[0] + " " +
+		name + " " + mess + "\n" + string(data)
 	_ = ioutil.WriteFile("comm.txt", []byte(newdata), 0644)
 	mu.Unlock()
 	http.Redirect(w, r, "/comments", http.StatusFound)
@@ -645,9 +657,7 @@ func commPage(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`
 		<div class="form-row">
 			<label for="form_list">Comment: </label>
-			<textarea rows="3" cols="30" name="mess"></textarea>
-		</div>
-		<div class="form-row">
+			<textarea rows="1" cols="30" name="mess"></textarea>
 			<input type="submit" name="send" value="Send">
 		</div>
 		</form>
@@ -658,12 +668,23 @@ func commPage(w http.ResponseWriter, r *http.Request) {
 	mu.Unlock()
 	array := strings.Split(string(data), "\n")
 	for _, ar := range array {
-		first := strings.Split(string(ar), " ")
-		if len(first) > 1 {
-			w.Write([]byte(`<p><b>` + first[0] + ` </b>`))
-			w.Write([]byte(first[1] + `</p>`))
+		first := strings.SplitN(string(ar), " ", 4)
+		if len(first) >= 4 {
+			w.Write([]byte(`<p><span style="color:#8B0000">[` +
+				first[0] + ` ` + first[1] + `]</span> `))
+			w.Write([]byte(`<b>` + first[2] + `: </b>` + first[3] + `</p>`))
 		}
 	}
+	writeEnd(w)
+}
+
+func eventsPage(w http.ResponseWriter, r *http.Request) {
+	writeGeneral(w, r)
+	w.Write([]byte(`<p><b>Internals Inspired Cup (2019)</b> [ ` +
+		`<a href="http://mopolauta.moposite.com/viewtopic.php?f` +
+		`=3&p=264423#p=264423/">Info</a> | ` +
+		`<a href="http://elmaonline.net/statistics/cups/13/">` +
+		`Point standings</a> ]</p>`))
 	writeEnd(w)
 }
 
@@ -678,11 +699,6 @@ func main() {
 	_ = ioutil.WriteFile("comm.txt",
 		[]byte(strings.Replace(string(comm), "\r", "", -1)), 0644)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("$PORT must be set")
-	}
-
 	http.HandleFunc("/login", loginPage)
 	http.HandleFunc("/action", actionPage)
 	http.HandleFunc("/addcard", addCard)
@@ -693,9 +709,15 @@ func main() {
 	http.HandleFunc("/download", download)
 	http.HandleFunc("/comments", commPage)
 	http.HandleFunc("/send", send)
+	http.HandleFunc("/events", eventsPage)
 	http.HandleFunc("/", mainPage)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+	http.ListenAndServe(":"+port, nil)
 
 	log.Println("starting server at :8080")
 	//http.ListenAndServe(":8080", nil)
-	http.ListenAndServe(":"+port, nil)
 }
