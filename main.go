@@ -15,6 +15,8 @@ func site() (string) {
 }
 
 func sendMess(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
+	w.WriteHeader(http.StatusOK)
 	req, err := http.NewRequest(http.MethodDelete,
 		"https://elmacards.herokuapp.com/events", nil)
 	if err == nil {
@@ -30,15 +32,9 @@ func sendMess(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getMess(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
-	log.Println("getmess-DONE")
-	http.Redirect(w, r, "/sandmess", http.StatusOK)
-}
-
 func main() {
 	http.HandleFunc("/", sendMess)
-	http.HandleFunc("/2", getMess)
+	//http.HandleFunc("/2", getMess)
 
 	port := os.Getenv("PORT")
 	if port == "" {
