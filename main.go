@@ -20,7 +20,15 @@ func sendMess(w http.ResponseWriter, r *http.Request) {
 	req, err := http.NewRequest(http.MethodDelete,
 		"https://elmacards.herokuapp.com/tobot", nil)
 	if err == nil {
-		client := &http.Client{Timeout:	2 * time.Second}
+		tr := &http.Transport{
+        		TLSClientConfig: &tls.Config{
+            			InsecureSkipVerify: true,
+        		},
+    		}
+    		client := &http.Client{
+        		Transport: tr,
+        		Timeout:   3 * time.Second,
+    		}
 		_, err := client.Do(req)
 		if err != nil {
 			log.Println("client error: " + err.Error())
