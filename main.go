@@ -33,8 +33,14 @@ func sendmess(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func sendmess2(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
+	w.WriteHeader(http.StatusOK)
+}
+
 func main() {
 	http.HandleFunc("/", sendmess)
+	http.HandleFunc("/2", sendmess2)
 
 	port := os.Getenv("PORT")
 	if port == "" {
