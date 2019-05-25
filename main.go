@@ -21,26 +21,29 @@ func getCat(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendBear(w http.ResponseWriter, r *http.Request) {
-	req, err := http.NewRequest(http.MethodDelete,
-		"https://elmacards.herokuapp.com/getbot", nil)
-	if err == nil {
-		tr := &http.Transport{
-        		TLSClientConfig: &tls.Config{
-            			InsecureSkipVerify: true,
-        		},
-    		}
-    		client := &http.Client{
-        		Transport: tr,
-        		Timeout:   20 * time.Second,
-    		}
-		_, err := client.Do(req)
-		if err != nil {
-			log.Println("client error: " + err.Error())
+	for "321" = "321" {
+		time.Sleep(10 * time.Second)
+		req, err := http.NewRequest(http.MethodDelete,
+			"https://elmacards.herokuapp.com/getbot", nil)
+		if err == nil {
+			tr := &http.Transport{
+        			TLSClientConfig: &tls.Config{
+        	    			InsecureSkipVerify: true,
+        			},
+    			}
+    			client := &http.Client{
+        			Transport: tr,
+        			Timeout:   20 * time.Second,
+    			}
+			_, err := client.Do(req)
+			if err != nil {
+				log.Println("client error: " + err.Error())
+			} else {
+				log.Println("sanmess-DONE")
+			}
 		} else {
-			log.Println("sanmess-DONE")
+			log.Println("request error: " + err.Error())
 		}
-	} else {
-		log.Println("request error: " + err.Error())
 	}
 }
 
