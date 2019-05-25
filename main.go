@@ -15,10 +15,8 @@ func site() (string) {
 }
 
 func sendmess(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
-	w.WriteHeader(http.StatusOK)
 	time.Sleep(2 * time.Minute)
-	req, err := http.NewRequest(http.MethodGet,
+	req, err := http.NewRequest(http.MethodDelete,
 		"https://elmacards.herokuapp.com/events", nil)
 	if err == nil {
 		client := &http.Client{Timeout:	2 * time.Second}
@@ -34,8 +32,8 @@ func sendmess(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendmess2(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
 	w.WriteHeader(http.StatusOK)
+	//w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
 }
 
 func main() {
