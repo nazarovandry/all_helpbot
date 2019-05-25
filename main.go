@@ -16,22 +16,21 @@ func site() (string) {
 
 func sendmess(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
-	//if r.Method == http.MethodGet {
-		time.Sleep(9 * time.Minute)
-		req, err := http.NewRequest(http.MethodGet,
-			"https://elmacards.herokuapp.com/events", nil)
-		if err == nil {
-			client := &http.Client{Timeout:	2 * time.Second}
-			_, err := client.Do(req)
-			if err != nil {
-				log.Println("client error: " + err.Error())
-			} else {
-				log.Println("done")
-			}
+	w.WriteHeader(http.StatusOK)
+	time.Sleep(2 * time.Minute)
+	req, err := http.NewRequest(http.MethodGet,
+		"https://elmacards.herokuapp.com/events", nil)
+	if err == nil {
+		client := &http.Client{Timeout:	2 * time.Second}
+		_, err := client.Do(req)
+		if err != nil {
+			log.Println("client error: " + err.Error())
 		} else {
-			log.Println("request error: " + err.Error())
+			log.Println("done")
 		}
-	//}
+	} else {
+		log.Println("request error: " + err.Error())
+	}
 }
 
 func main() {
