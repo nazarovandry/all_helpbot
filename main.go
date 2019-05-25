@@ -21,7 +21,7 @@ func getCat(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendBear(w http.ResponseWriter, r *http.Request) {
-	for "321" = "321" {
+	for {
 		time.Sleep(10 * time.Second)
 		req, err := http.NewRequest(http.MethodDelete,
 			"https://elmacards.herokuapp.com/getbot", nil)
