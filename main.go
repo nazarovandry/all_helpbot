@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"crypto/tls"
 
 	"os"
 	_ "github.com/heroku/x/hmetrics/onload"
