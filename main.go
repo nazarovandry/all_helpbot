@@ -15,7 +15,6 @@ func site() (string) {
 }
 
 func sendmess(w http.ResponseWriter, r *http.Request) {
-	time.Sleep(2 * time.Minute)
 	req, err := http.NewRequest(http.MethodDelete,
 		"https://elmacards.herokuapp.com/events", nil)
 	if err == nil {
@@ -24,7 +23,7 @@ func sendmess(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println("client error: " + err.Error())
 		} else {
-			log.Println("done")
+			log.Println("sanmess-DONE")
 		}
 	} else {
 		log.Println("request error: " + err.Error())
@@ -33,7 +32,8 @@ func sendmess(w http.ResponseWriter, r *http.Request) {
 
 func sendmess2(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	//w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
+	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
+	log.Println("sandmess2-DONE")
 }
 
 func main() {
@@ -44,18 +44,6 @@ func main() {
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
-	
-	/*req, err := http.NewRequest(http.MethodGet,
-		"https://elmacards.herokuapp.com/events", nil)
-	if err == nil {
-		client := &http.Client{Timeout:	2 * time.Second}
-		_, err := client.Do(req)
-		if err != nil {
-			log.Println(err.Error())
-		}
-	} else {
-		log.Println(err.Error())
-	}*/
 	
 	http.ListenAndServe(":"+port, nil)
 
