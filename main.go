@@ -10,11 +10,6 @@ import (
 	_ "github.com/heroku/x/hmetrics/onload"
 )
 
-func site() (string) {
-	return "https://cdracamle.herokuapp.com/"
-	// return "/"
-}
-
 func getCat(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
@@ -22,7 +17,7 @@ func getCat(w http.ResponseWriter, r *http.Request) {
 
 func sendBear(w http.ResponseWriter, r *http.Request) {
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(12 * time.Minute)
 		req, err := http.NewRequest(http.MethodDelete,
 			"https://elmacards.herokuapp.com/getbot", nil)
 		if err == nil {
