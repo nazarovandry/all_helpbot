@@ -24,12 +24,12 @@ func sendmess(w http.ResponseWriter, r *http.Request) {
 			client := &http.Client{Timeout:	2 * time.Second}
 			_, err := client.Do(req)
 			if err != nil {
-				log.Println(err.Error())
+				log.Println("client error: " + err.Error())
 			} else {
 				log.Println("done")
 			}
 		} else {
-			log.Println(err.Error())
+			log.Println("request error: " + err.Error())
 		}
 	//}
 }
