@@ -10,6 +10,10 @@ import (
 	_ "github.com/heroku/x/hmetrics/onload"
 )
 
+func mainPage(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(`<!doctype html><html><body><p>Main Page</p></body></html>`))
+}
+
 func getCat(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
@@ -45,6 +49,7 @@ func sendBear(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/sendbot", sendBear)
 	http.HandleFunc("/getbot", getCat)
+	http.HandleFunc("/", mainPage)
 
 	port := os.Getenv("PORT")
 	if port == "" {
