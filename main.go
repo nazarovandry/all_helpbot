@@ -24,7 +24,7 @@ func getCat(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 	} else {
 		*bot -= 1
 	}
-	if *bot < -3 {
+	if *bot < -2 {
 		*bot = 0
 		mu.Unlock()
 		log.Println("HELP!")
@@ -37,7 +37,7 @@ func getCat(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 
 func sendBear(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 	for {
-		time.Sleep(5 * time.Minute)
+		time.Sleep(3 * time.Minute)
 		req, err := http.NewRequest(http.MethodDelete,
 			"https://elmacards.herokuapp.com/getbot", nil)
 		if err == nil {
