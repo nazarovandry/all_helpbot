@@ -37,7 +37,7 @@ func getCat(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 
 func sendBear(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Minute)
 		req, err := http.NewRequest(http.MethodDelete,
 			"https://elmacards.herokuapp.com/getbot", nil)
 		if err == nil {
