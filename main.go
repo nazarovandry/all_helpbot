@@ -29,7 +29,7 @@ func getCat(w http.ResponseWriter, r *http.Request, bot *int, botLock *bool, mu 
 		*botLock = true
 		mu.Unlock()
 		log.Println("HELP!")
-		go sendBear(w, r, bot, mu)
+		go sendBear(w, r, bot, botLock, mu)
 		mu.Lock()
 	}
 	mu.Unlock()
