@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 	"crypto/tls"
+	"sync"
 
 	"os"
 	_ "github.com/heroku/x/hmetrics/onload"
@@ -14,20 +15,35 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`<!doctype html><html><body><p>Main Page</p></body></html>`))
 }
 
-func getCat(w http.ResponseWriter, r *http.Request) {
+func getCat(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
+	mu.Lock()
+	if *bot > 0 {
+		*bot = 0
+	} else {
+		*bot -= 1
+	}
+	if *bot < -3 {
+		*bot = 0
+		mu.Unlock()
+		log.Println("HELP!")
+		go sendBear(w, r, bot, mu)
+		mu.Lock()
+	}
+	mu.Unlock()
+	log.Println("getmess-OK ", *bot)
 }
 
-func sendBear(w http.ResponseWriter, r *http.Request) {
+func sendBear(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 	for {
-		time.Sleep(2 * time.Minute)
+		time.Sleep(10 * time.Second)
 		req, err := http.NewRequest(http.MethodDelete,
 			"https://elmacards.herokuapp.com/getbot", nil)
 		if err == nil {
 			tr := &http.Transport{
         			TLSClientConfig: &tls.Config{
-        	    			InsecureSkipVerify: true,
+        	    		InsecureSkipVerify: true,
         			},
     			}
     			client := &http.Client{
@@ -38,7 +54,10 @@ func sendBear(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Println("client error: " + err.Error())
 			} else {
-				log.Println("sanmess-DONE")
+				mu.Lock()
+				*bot = 1
+				mu.Unlock()
+				log.Println("sendmess-DONE ", *bot)
 			}
 		} else {
 			log.Println("request error: " + err.Error())
@@ -47,17 +66,26 @@ func sendBear(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/sendbot", sendBear)
-	http.HandleFunc("/getbot", getCat)
+	botInt := 0
+	bot := &botInt
+	mu := &sync.Mutex{}
+	
+	http.HandleFunc("/sendbot", func(w http.ResponseWriter, r *http.Request) {
+		sendBear(w, r, bot, mu)
+	})
+
+	http.HandleFunc("/getbot", func(w http.ResponseWriter, r *http.Request) { 
+		getCat(w, r, bot, mu)
+	})
+
 	http.HandleFunc("/", mainPage)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
-	
 	http.ListenAndServe(":"+port, nil)
 
-	log.Println("starting server at :8080")
-	//http.ListenAndServe(":8080", nil)
+	log.Println("starting server at :8081")
+	//http.ListenAndServe(":8081", nil)
 }
