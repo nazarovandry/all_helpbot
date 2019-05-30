@@ -15,7 +15,7 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`<!doctype html><html><body><p>Main Page</p></body></html>`))
 }
 
-func getCat(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
+func getCat(w http.ResponseWriter, r *http.Request, bot *int, botLock *bool, mu *sync.Mutex) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
 	mu.Lock()
@@ -26,6 +26,7 @@ func getCat(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 	}
 	if *bot < -2 {
 		*bot = 0
+		*botLock = true
 		mu.Unlock()
 		log.Println("HELP!")
 		go sendBear(w, r, bot, mu)
@@ -35,7 +36,14 @@ func getCat(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
 	log.Println("getmess-OK ", *bot)
 }
 
-func sendBear(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) {
+func sendBear(w http.ResponseWriter, r *http.Request, bot *int, botLock *bool, mu *sync.Mutex) {
+	mu.Lock()
+	if !(*botLock) {
+		mu.Unlock()
+		log.Println("No pls!")
+		return
+	}
+	*botLock = false
 	for {
 		time.Sleep(3 * time.Minute)
 		req, err := http.NewRequest(http.MethodDelete,
@@ -52,6 +60,9 @@ func sendBear(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) 
     			}
 			_, err := client.Do(req)
 			if err != nil {
+				mu.Lock()
+				*bot = 0
+				mu.Unlock()
 				log.Println("client error: " + err.Error())
 			} else {
 				mu.Lock()
@@ -60,6 +71,9 @@ func sendBear(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) 
 				log.Println("sendmess-DONE ", *bot)
 			}
 		} else {
+			mu.Lock()
+			*bot = 0
+			mu.Unlock()
 			log.Println("request error: " + err.Error())
 		}
 	}
@@ -68,14 +82,16 @@ func sendBear(w http.ResponseWriter, r *http.Request, bot *int, mu *sync.Mutex) 
 func main() {
 	botInt := 0
 	bot := &botInt
+	botLockBool := true
+	botLock := &botLockBool
 	mu := &sync.Mutex{}
 	
 	http.HandleFunc("/sendbot", func(w http.ResponseWriter, r *http.Request) {
-		sendBear(w, r, bot, mu)
+		sendBear(w, r, bot, botLock, mu)
 	})
 
 	http.HandleFunc("/getbot", func(w http.ResponseWriter, r *http.Request) { 
-		getCat(w, r, bot, mu)
+		getCat(w, r, bot, botLock, mu)
 	})
 
 	http.HandleFunc("/", mainPage)
