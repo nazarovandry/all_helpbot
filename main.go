@@ -44,6 +44,7 @@ func sendBear(w http.ResponseWriter, r *http.Request, bot *int, botLock *bool, m
 		return
 	}
 	*botLock = false
+	mu.Unlock()
 	for {
 		time.Sleep(3 * time.Minute)
 		req, err := http.NewRequest(http.MethodDelete,
