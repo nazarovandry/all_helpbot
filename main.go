@@ -63,7 +63,7 @@ func sendBear(w http.ResponseWriter, r *http.Request, bot *int,
 	mu.Unlock()
 	for {
 		time.Sleep(3 * time.Minute)
-		//time.Sleep(10 * time.Second)
+		//time.Sleep(10 *time.Second)
 		mu.Lock()
 		data := bytes.NewReader(*savings)
 		mu.Unlock()
