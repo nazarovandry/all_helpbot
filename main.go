@@ -6,16 +6,31 @@ import (
 	"time"
 	"crypto/tls"
 	"sync"
+	"io/ioutil"
+	"bytes"
 
 	"os"
 	_ "github.com/heroku/x/hmetrics/onload"
 )
 
-func mainPage(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(`<!doctype html><html><body><p>Main Page</p></body></html>`))
+func otherSite() (string) {
+	return "https://elmacards.herokuapp.com/"
+	//return "http://127.0.0.1:8080/"
 }
 
-func getCat(w http.ResponseWriter, r *http.Request, bot *int, botLock *bool, mu *sync.Mutex) {
+func mainPage(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(`<!doctype html><html><body><p>MainPage</p></body></html>`))
+}
+
+func getCat(w http.ResponseWriter, r *http.Request, bot *int,
+	botLock *bool, mu *sync.Mutex, savings *[]byte) {
+	out, err := ioutil.ReadAll(r.Body)
+	if err == nil {
+		log.Println("I have got: '" + string(out)[:50] + "'!")
+		*savings = out
+	} else {
+		log.Println(err.Error())
+	}
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`<!doctype html><html><body><p>TEST!</p></body></html>`))
 	mu.Lock()
@@ -29,14 +44,15 @@ func getCat(w http.ResponseWriter, r *http.Request, bot *int, botLock *bool, mu 
 		*botLock = true
 		mu.Unlock()
 		log.Println("HELP!")
-		go sendBear(w, r, bot, botLock, mu)
+		go sendBear(w, r, bot, botLock, mu, savings)
 		mu.Lock()
 	}
 	mu.Unlock()
 	log.Println("getmess-OK ", *bot)
 }
 
-func sendBear(w http.ResponseWriter, r *http.Request, bot *int, botLock *bool, mu *sync.Mutex) {
+func sendBear(w http.ResponseWriter, r *http.Request, bot *int,
+	botLock *bool, mu *sync.Mutex, savings*[]byte) {
 	mu.Lock()
 	if !(*botLock) {
 		mu.Unlock()
@@ -46,9 +62,13 @@ func sendBear(w http.ResponseWriter, r *http.Request, bot *int, botLock *bool, m
 	*botLock = false
 	mu.Unlock()
 	for {
-		time.Sleep(3 * time.Minute)
+		//time.Sleep(3 * time.Minute)
+		time.Sleep(10 * time.Second)
+		mu.Lock()
+		data := bytes.NewReader(*savings)
+		mu.Unlock()
 		req, err := http.NewRequest(http.MethodDelete,
-			"https://elmacards.herokuapp.com/getbot", nil)
+			otherSite() + "getbot", data)
 		if err == nil {
 			tr := &http.Transport{
         			TLSClientConfig: &tls.Config{
@@ -86,13 +106,15 @@ func main() {
 	botLockBool := true
 	botLock := &botLockBool
 	mu := &sync.Mutex{}
+	byt := []byte("(-BLOCK-)\n\nAndrY(-ELEM-)andry(-ELEM-)(-STRING-)(-BLOCK-)\n\n1922-06-31 20:07:42(-ELEM-)AndrY(-ELEM-)Wait, the database is not ready yet...(-STRING-)(-BLOCK-)\n\nSite is broken. Soon it will be fixed.(-BLOCK-)")
+	savings := &byt
 	
 	http.HandleFunc("/sendbot", func(w http.ResponseWriter, r *http.Request) {
-		sendBear(w, r, bot, botLock, mu)
+		sendBear(w, r, bot, botLock, mu, savings)
 	})
 
 	http.HandleFunc("/getbot", func(w http.ResponseWriter, r *http.Request) { 
-		getCat(w, r, bot, botLock, mu)
+		getCat(w, r, bot, botLock, mu, savings)
 	})
 
 	http.HandleFunc("/", mainPage)
@@ -102,7 +124,7 @@ func main() {
 		log.Fatal("$PORT must be set")
 	}
 	http.ListenAndServe(":"+port, nil)
-
+	
 	log.Println("starting server at :8081")
 	//http.ListenAndServe(":8081", nil)
 }
